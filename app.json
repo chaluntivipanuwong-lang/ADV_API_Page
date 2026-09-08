@@ -1,0 +1,57 @@
+{
+  "id": "cf8bf99b-3771-4b55-98d8-4b414e9b6e30",
+  "name": "ADV_API_Page",
+  "publisher": "Default Publisher",
+  "version": "1.0.0.0",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [
+    {
+      "id": "2a0547fa-f60f-401d-b1fe-c7c4be8fb230",
+      "name": "LS Central System App",
+      "publisher": "LS Retail",
+      "version": "24.1.0.306"
+    },
+    {
+      "id": "5ecfc871-5d82-43f1-9c54-59685e82318d",
+      "name": "LS Central",
+      "publisher": "LS Retail",
+      "version": "24.1.0.306"
+    },
+    {
+      "id": "63ca2fa4-4f03-4f2b-a480-172fef340d3f",
+      "name": "System Application",
+      "publisher": "Microsoft",
+      "version": "24.1.18927.19498"
+    },
+    {
+      "id": "d6c4326b-7a39-4ae8-93cb-1537cda0948b",
+      "name": "ALCOOP_OIL",
+      "publisher": "Default Publisher",
+      "version": "1.0.0.1"
+    }
+  ],
+  "screenshots": [],
+  "platform": "1.0.0.0",
+  "application": "24.0.0.0",
+  "idRanges": [
+    {
+      "from": 50100,
+      "to": 59999
+    }
+  ],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": true,
+    "includeSourceInSymbolFile": true
+  },
+  "runtime": "13.0",
+  "features": [
+    "NoImplicitWith"
+  ]
+}
