@@ -98,6 +98,16 @@ page 50548 "API Response Viewer"
                     CallAPI();
                 end;
             }
+            action(Swith2OAuth2)
+            {
+                ApplicationArea = All;
+                Caption = 'Swith to OAuth2.0';
+                Image = SwitchCompanies;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                RunObject = page "OAuth2 Test Card";
+            }
         }
     }
 

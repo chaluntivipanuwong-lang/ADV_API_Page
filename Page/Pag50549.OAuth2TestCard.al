@@ -136,6 +136,16 @@ page 50549 "OAuth2 Test Card"
                     CallTargetAPI();
                 end;
             }
+            action(Swith2Basic)
+            {
+                ApplicationArea = All;
+                Caption = 'Swith to Basic';
+                Image = SwitchCompanies;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                RunObject = Page "API Response Viewer";
+            }
         }
     }
 
