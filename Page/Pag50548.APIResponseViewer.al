@@ -5,9 +5,6 @@ page 50548 "API Response Viewer"
     UsageCategory = Tasks;
     Caption = 'API Response Viewer';
 
-    SourceTable = "LSC Web Service Setup";
-    SourceTableTemporary = true;
-
     layout
     {
         area(Content)
@@ -60,21 +57,33 @@ page 50548 "API Response Viewer"
             {
                 Caption = 'Request Parameters';
 
-                field(LoginURL; Rec."Login URL")
+                field(LoginURL; wssetup."Login URL")
                 {
                     ApplicationArea = All;
                     Caption = 'Endpoint URL';
+                    trigger OnValidate()
+                    begin
+                        wssetup.Modify();
+                    end;
                 }
-                field(Username; Rec.Username)
+                field(Username; wssetup.Username)
                 {
                     ApplicationArea = All;
                     Caption = 'Username';
+                    trigger OnValidate()
+                    begin
+                        wssetup.Modify();
+                    end;
                 }
-                field(Password; Rec.Password)
+                field(Password; wssetup.Password)
                 {
                     ApplicationArea = All;
                     Caption = 'Password';
                     ExtendedDatatype = Masked;
+                    trigger OnValidate()
+                    begin
+                        wssetup.Modify();
+                    end;
                 }
             }
         }
@@ -112,12 +121,19 @@ page 50548 "API Response Viewer"
     }
 
     trigger OnOpenPage()
+    var
+        RealWsSetup: Record "LSC Web Service Setup";
     begin
-        if Rec.IsEmpty() then
-            Rec.Insert();
+        // 🌟 ดึงข้อมูลจากตารางจริงมาคัดลอกใส่ตารางจำลอง (Temp Table)
+        wssetup.Init();
+        if RealWsSetup.Get() then
+            wssetup.TransferFields(RealWsSetup);
+
+        wssetup.Insert();
     end;
 
     var
+        wssetup: Record "LSC Web Service Setup" temporary; // 🌟 เติมคำว่า temporary ป้องกันการบันทึกลงฐานข้อมูลจริง
         ResponseStatusCode: Integer;
         ResponseHeadersText: Text;
         ResponseBodyText: Text;
@@ -138,7 +154,7 @@ page 50548 "API Response Viewer"
         StandardJsonText: Text;
         CRLF: Text[2];
     begin
-        if Rec."Login URL" = '' then
+        if wssetup."Login URL" = '' then
             Error('กรุณากรอก Endpoint URL ก่อนกดส่ง');
 
         CRLF[1] := 13;
@@ -149,13 +165,13 @@ page 50548 "API Response Viewer"
         Clear(ResponseBodyText);
         Clear(StatusStyle);
 
-        if (Rec.Username <> '') or (Rec.Password <> '') then begin
-            AuthString := StrSubstNo('%1:%2', Rec.Username, Rec.Password);
+        if (wssetup.Username <> '') or (wssetup.Password <> '') then begin
+            AuthString := StrSubstNo('%1:%2', wssetup.Username, wssetup.Password);
             RequestHeaders := Client.DefaultRequestHeaders();
             RequestHeaders.Add('Authorization', 'Basic ' + Base64Convert.ToBase64(AuthString));
         end;
 
-        if Client.Get(Rec."Login URL", ResponseMessage) then begin
+        if Client.Get(wssetup."Login URL", ResponseMessage) then begin
             ResponseStatusCode := ResponseMessage.HttpStatusCode();
 
             if ResponseMessage.IsSuccessStatusCode() then

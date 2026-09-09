@@ -136,16 +136,16 @@ page 50549 "OAuth2 Test Card"
                     CallTargetAPI();
                 end;
             }
-            action(Swith2Basic)
-            {
-                ApplicationArea = All;
-                Caption = 'Swith to Basic';
-                Image = SwitchCompanies;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                RunObject = Page "API Response Viewer";
-            }
+            // action(Swith2Basic)
+            // {
+            //     ApplicationArea = All;
+            //     Caption = 'Swith to Basic';
+            //     Image = SwitchCompanies;
+            //     Promoted = true;
+            //     PromotedCategory = Process;
+            //     PromotedOnly = true;
+            //     RunObject = Page "API Response Viewer";
+            // }
         }
     }
 
@@ -161,6 +161,15 @@ page 50549 "OAuth2 Test Card"
         ResponseHeadersText: Text;
         ResponseBodyText: Text;
         StatusStyle: Text;
+
+    trigger OnOpenPage()
+    begin
+        TargetApiUrl := 'https://api.businesscentral.dynamics.com/v2.0/de8dd87f-40da-4ebd-b8b7-5c720db80708/Sandbox1/api/avision/avapi/v1.0/companies(8c2d2d58-f25e-f111-8e24-7ced8d25bfd9)/getsaleapis?$filter=customerNo gt ''C0001''';
+        TokenEndpoint := 'https://login.microsoftonline.com/de8dd87f-40da-4ebd-b8b7-5c720db80708/oauth2/v2.0/token';
+        ClientId := '58a93236-6844-4ba5-a91f-893edf306d02';
+        ClientSecret := '5cL8Q~IYXxknsY-THQ1m9jRcaIC~vZY7ODeTRdxI';
+        Scope := 'https://api.businesscentral.dynamics.com/.default';
+    end;
 
     local procedure RequestOAuthToken()
     var
