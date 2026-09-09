@@ -57,33 +57,21 @@ page 50548 "API Response Viewer"
             {
                 Caption = 'Request Parameters';
 
-                field(LoginURL; wssetup."Login URL")
+                field(LoginURL; LoginURL)
                 {
                     ApplicationArea = All;
                     Caption = 'Endpoint URL';
-                    trigger OnValidate()
-                    begin
-                        wssetup.Modify();
-                    end;
                 }
-                field(Username; wssetup.Username)
+                field(Username; Username)
                 {
                     ApplicationArea = All;
                     Caption = 'Username';
-                    trigger OnValidate()
-                    begin
-                        wssetup.Modify();
-                    end;
                 }
-                field(Password; wssetup.Password)
+                field(Password; Password)
                 {
                     ApplicationArea = All;
                     Caption = 'Password';
                     ExtendedDatatype = Masked;
-                    trigger OnValidate()
-                    begin
-                        wssetup.Modify();
-                    end;
                 }
             }
         }
@@ -122,22 +110,26 @@ page 50548 "API Response Viewer"
 
     trigger OnOpenPage()
     var
-        RealWsSetup: Record "LSC Web Service Setup";
+        wssetup: Record BasicAuthSetup;
     begin
         // 🌟 ดึงข้อมูลจากตารางจริงมาคัดลอกใส่ตารางจำลอง (Temp Table)
-        wssetup.Init();
-        if RealWsSetup.Get() then
-            wssetup.TransferFields(RealWsSetup);
+        wssetup.Get();
 
-        wssetup.Insert();
+        LoginURL := wssetup."Endpoint URL";
+        Username := wssetup.Username;
+        Password := wssetup.Password;
+
+
     end;
 
     var
-        wssetup: Record "LSC Web Service Setup" temporary; // 🌟 เติมคำว่า temporary ป้องกันการบันทึกลงฐานข้อมูลจริง
         ResponseStatusCode: Integer;
         ResponseHeadersText: Text;
         ResponseBodyText: Text;
         StatusStyle: Text;
+        Username: Text;
+        Password: Text;
+        LoginURL: Text;
 
     local procedure CallAPI()
     var
@@ -153,8 +145,9 @@ page 50548 "API Response Viewer"
         RawContent: Text;
         StandardJsonText: Text;
         CRLF: Text[2];
+
     begin
-        if wssetup."Login URL" = '' then
+        if LoginURL = '' then
             Error('กรุณากรอก Endpoint URL ก่อนกดส่ง');
 
         CRLF[1] := 13;
@@ -165,13 +158,13 @@ page 50548 "API Response Viewer"
         Clear(ResponseBodyText);
         Clear(StatusStyle);
 
-        if (wssetup.Username <> '') or (wssetup.Password <> '') then begin
-            AuthString := StrSubstNo('%1:%2', wssetup.Username, wssetup.Password);
+        if (Username <> '') or (Password <> '') then begin
+            AuthString := StrSubstNo('%1:%2', Username, Password);
             RequestHeaders := Client.DefaultRequestHeaders();
             RequestHeaders.Add('Authorization', 'Basic ' + Base64Convert.ToBase64(AuthString));
         end;
 
-        if Client.Get(wssetup."Login URL", ResponseMessage) then begin
+        if Client.Get(LoginURL, ResponseMessage) then begin
             ResponseStatusCode := ResponseMessage.HttpStatusCode();
 
             if ResponseMessage.IsSuccessStatusCode() then
