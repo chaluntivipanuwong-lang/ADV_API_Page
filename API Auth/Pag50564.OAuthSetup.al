@@ -1,4 +1,4 @@
-page 50571 "OAuth Setup"
+page 50564 "OAuth Setup"
 {
     PageType = Card;
     ApplicationArea = All;

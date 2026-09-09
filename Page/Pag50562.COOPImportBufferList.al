@@ -1,4 +1,4 @@
-page 50570 "COOP Import Buffer List"
+page 50562 "COOP Import Buffer List"
 {
     PageType = List;
     ApplicationArea = All;

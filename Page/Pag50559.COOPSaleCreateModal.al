@@ -1,4 +1,4 @@
-page 50566 "COOP Sale Create Modal"
+page 50559 "COOP Sale Create Modal"
 {
     PageType = Card;
     Caption = 'New Sales Order (via API)';

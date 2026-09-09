@@ -33,10 +33,20 @@ page 50548 "API Response Viewer"
                 }
             }
 
+            group(BodyGroup1)
+            {
+                Caption = 'Response Body (Formatted Table)';
+                part(APIDataLines; "API Sales Header Subpage")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Data Lines';
+                }
+            }
+
             // ==========================================
             // Group ล่าง: Response Body (Pretty JSON)
             // ==========================================
-            group(BodyGroup)
+            group(BodyGroup2)
             {
                 Caption = 'Response Body (Formatted JSON)';
 
@@ -48,6 +58,7 @@ page 50548 "API Response Viewer"
                     MultiLine = true;
                     ToolTip = 'ข้อมูล JSON แบบ Pretty Format เว้นบรรทัดและย่อหน้าสวยงาม';
                 }
+
             }
 
             // ==========================================
@@ -146,6 +157,13 @@ page 50548 "API Response Viewer"
         StandardJsonText: Text;
         CRLF: Text[2];
 
+        // 🌟 ตัวแปรสำหรับแกะ JSON ลง Table
+        APISalesBuffer: Record "API Sales Header Buffer" temporary;
+        JObjectMain: JsonObject;
+        JObjectRow: JsonObject;
+        JItem: JsonToken;
+        JValue: JsonToken;
+        NextEntryNo: Integer;
     begin
         if LoginURL = '' then
             Error('กรุณากรอก Endpoint URL ก่อนกดส่ง');
@@ -189,6 +207,55 @@ page 50548 "API Response Viewer"
             if JToken.ReadFrom(RawContent) then begin
                 JToken.WriteTo(StandardJsonText);
                 ResponseBodyText := FormatPrettyJson(StandardJsonText);
+
+                // ==========================================
+                // 🌟 โค้ดส่วนที่ดึง JSON Header ลง Table 🌟
+                // ==========================================
+                if JToken.IsObject() then begin
+                    JObjectMain := JToken.AsObject();
+
+                    if JObjectMain.SelectToken('value', JToken) then begin
+                        if JToken.IsArray() then begin
+
+                            // ล้างข้อมูลเก่าก่อนดึงของใหม่มาโชว์
+                            APISalesBuffer.Reset();
+                            APISalesBuffer.DeleteAll();
+
+                            NextEntryNo := 1; // 🌟 2. เซ็ตค่าเริ่มต้นให้บรรทัดแรกเป็นเลข 1
+
+                            // วนลูปอ่านข้อมูลทีละปีกกาในก้อน Array
+                            foreach JItem in JToken.AsArray() do begin
+                                JObjectRow := JItem.AsObject();
+                                APISalesBuffer.Init();
+
+                                // 🌟 3. บังคับใส่ Primary Key เอง เพื่อป้องกัน Error เลขซ้ำ
+                                APISalesBuffer."Entry No." := NextEntryNo;
+                                NextEntryNo += 1; // บวกเลขรอสำหรับบรรทัดถัดไป
+
+                                if JObjectRow.Get('documentNo', JValue) then
+                                    if not JValue.AsValue().IsNull() then
+                                        APISalesBuffer."Document No." := JValue.AsValue().AsText();
+
+                                if JObjectRow.Get('customerNo', JValue) then
+                                    if not JValue.AsValue().IsNull() then
+                                        APISalesBuffer."Customer No." := JValue.AsValue().AsText();
+
+                                if JObjectRow.Get('customerName', JValue) then
+                                    if not JValue.AsValue().IsNull() then
+                                        APISalesBuffer."Customer Name" := JValue.AsValue().AsText();
+
+                                if JObjectRow.Get('totalAmount', JValue) then
+                                    if not JValue.AsValue().IsNull() then
+                                        APISalesBuffer."Total Amount" := JValue.AsValue().AsDecimal();
+
+                                APISalesBuffer.Insert();
+                                CurrPage.APIDataLines.Page.LoadTempRecords(APISalesBuffer);
+                            end;
+                        end;
+                    end;
+                end;
+                // ==========================================
+
             end else
                 ResponseBodyText := RawContent;
 
@@ -198,6 +265,9 @@ page 50548 "API Response Viewer"
             ResponseBodyText := 'ไม่สามารถเชื่อมต่อปลายทางได้ (Connection / Network Failed)';
             StatusStyle := 'Attention';
         end;
+
+        // สั่งให้ตาราง ListPart รีเฟรชข้อมูลมาแสดงบนหน้าจอทันที
+        CurrPage.APIDataLines.Page.Update(false);
     end;
 
     // ฟังก์ชันจัด Indent (ย่อหน้า 2 เคาะ) และเคาะขึ้นบรรทัดใหม่อัตโนมัติ

@@ -4,7 +4,6 @@ page 50557 "COOP Sale Order Card"
     Caption = 'COOP Sales Order';
     SourceTable = COOP_Sale_Header_Por;
     ApplicationArea = All;
-    DeleteAllowed = false;
     InsertAllowed = false;
 
     layout

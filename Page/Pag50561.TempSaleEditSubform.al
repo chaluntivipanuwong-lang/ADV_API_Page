@@ -1,4 +1,4 @@
-page 50568 "Temp Sale Edit Subform"
+page 50561 "Temp Sale Edit Subform"
 {
     PageType = ListPart;
     Caption = 'Order Lines';

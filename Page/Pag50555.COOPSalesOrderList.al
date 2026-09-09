@@ -7,7 +7,6 @@ page 50555 "COOP Sales Order List"
     SourceTable = COOP_Sale_Header_Por;
     Editable = false;
     CardPageId = "COOP Sale Order Card";
-    DeleteAllowed = false;
     InsertAllowed = false;
 
     layout

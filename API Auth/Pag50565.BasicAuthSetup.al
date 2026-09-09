@@ -1,4 +1,4 @@
-page 50572 "Basic Auth Setup"
+page 50565 "Basic Auth Setup"
 {
     PageType = Card;
     ApplicationArea = All;
